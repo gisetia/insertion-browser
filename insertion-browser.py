@@ -26,7 +26,7 @@ import tools.plotting.transcripts as plttx
 # col1.bokeh_chart(p, use_container_width=True)
 # col2.write('This is a sidebar')
 # %%
-screen_name = 'screenA'
+screen_name = 'screenA_sample'
 gene = 'EPC2'
 
 print('Loading refseq...')
