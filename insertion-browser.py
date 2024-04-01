@@ -29,6 +29,7 @@ import tools.plotting.transcripts as plttx
 screen_name = 'screenA'
 gene = 'EPC2'
 
+print('Loading refseq...')
 refseq = load_gene_annotations('refseq_hg38').query(
     'known == True and coding == True')
 
@@ -46,6 +47,7 @@ end = gene_pos.txEnd.max()
 # start = int(position.split(':')[1].split('-')[0].replace(',', '')) - 1
 # end = int(position.split(':')[1].split('-')[1].replace(',', ''))
 
+print('Loading insertions...')
 insertions = load_insertions(screen_name)
 
 
