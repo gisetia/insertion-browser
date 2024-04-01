@@ -1,4 +1,4 @@
-web: bokeh serve --port=$PORT --allow-websocket-origin=apricot-crisp-59118-d09d40635062.herokuapp.com --address=0.0.0.0 --use-xheaders insertion-browser.py
+web: bokeh serve --port=$PORT --allow-websocket-origin=insertion-browser-0dfa65fe8479.herokuapp.com --address=0.0.0.0 --use-xheaders insertion-browser.py
 
 
 #web: gunicorn gettingstarted.wsgi
