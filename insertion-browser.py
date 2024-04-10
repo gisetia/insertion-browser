@@ -85,7 +85,7 @@ def plot_ins(insertions, screen_name, chrom, start, end, refseq,
 plots = plot_ins(insertions, screen_name, chrom, start, end, refseq)
 
 # Menus
-menu_margins = (20, 30, 0, 10)
+menu_margins = (20, 10, 0, 10)
 menu_width = 150
 pos_input = TextInput(title='1-based position', value='',
                       placeholder='eg. chr9:5,450,503-5,470,567',

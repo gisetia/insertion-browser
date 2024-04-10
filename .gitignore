@@ -1,5 +1,8 @@
 .venv/
 venv/
+raw_data/
+processed_data/
+process_data.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
