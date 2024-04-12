@@ -15,7 +15,8 @@ import tools.plotting.transcripts as plttx
 # %%
 
 data_path = 'gs://gisetia-insertion-browser/processed_data'
-data_path = 'processed_data'
+if os.uname().sysname == 'Darwin':
+    data_path = 'processed_data'
 
 # %%
 menu_margins = (20, 2, 0, 10)
