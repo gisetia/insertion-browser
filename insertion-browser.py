@@ -20,7 +20,7 @@ if os.uname().sysname == 'Darwin':
 
 # %%
 menu_margins = (20, 2, 0, 10)
-menu_width = 180
+menu_width = 170
 txt_out = Div(text='', margin=menu_margins, width=menu_width)
 
 assembly = 'hg38'

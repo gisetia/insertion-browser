@@ -57,7 +57,7 @@ class InsertionPlot():
         self.plt = figure(
             # title=(f'Insertions of screen {screen_name} - {assembly} at '
             #        f'{chrom}:{start + 1:,} - {end:,} ({end-start+1:,} bp)'),
-            plot_width=1000, plot_height=height,
+            plot_width=900, plot_height=height,
             x_range=Range1d(start - margins,
                             end + margins,
                             bounds=(start-self.load_padd, end+self.load_padd),
