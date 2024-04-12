@@ -14,7 +14,7 @@ class TranscriptPlot():
 
     def __init__(self, refseq: pd.DataFrame, assembly: str, chrom: str,
                  start: int, end: int,
-                 load_padd: Optional[int] = 100000,
+                 load_padd: Optional[int] = 300000,
                  dashed_edges: Optional[bool] = True,
                  load_gene: Optional[str] = None,
                  x_axis: Optional[bool] = True) -> None:
@@ -42,11 +42,11 @@ class TranscriptPlot():
             plot_height = (tx_num)*20
             plot_title = self.load_gene
 
-        plot_height = (len(self.transcripts))*20
-        print('plot_height', len(self.transcripts), plot_height)
+        plot_height = (len(self.transcripts))*15
+        # print('plot_height', len(self.transcripts), plot_height)
 
         # Set plot
-        self.ylim = (0.5, len(self.transcripts) + 0.5)
+        self.ylim = (0.5, len(self.transcripts) + 0.8)
         self.plt = figure(plot_width=1000, frame_height=plot_height,
                           x_range=Range1d(start-(end-start)/60,  # - 1000,
                                           end+(end-start)/60,  # + 1000,
@@ -59,13 +59,14 @@ class TranscriptPlot():
                           min_border_left=150, min_border_right=50,
                           #   min_border_top=100,
                           x_axis_location='below',
-                          tools='reset, save, xwheel_pan, xwheel_zoom',
-                          active_scroll='xwheel_pan')
+                          tools='reset, save, xpan, xwheel_zoom',
+                          active_scroll='xwheel_zoom', active_drag='xpan')
         self.plt.xaxis.formatter = NumeralTickFormatter(format='0,0')
         self.plt.ygrid.grid_line_color = None
         self.plt.xgrid.grid_line_color = None
         self.plt.yaxis.visible = False
         self.plt.outline_line_color = None
+        self.plt.toolbar.logo = None
 
         if not x_axis:
             self.plt.xaxis.visible = False
@@ -173,13 +174,15 @@ class TranscriptPlot():
                                            '(txStart >= @load_start '
                                            '& txStart <= @load_end) |'
                                            '(txStart <= @load_start '
-                                           '& txStart >= @load_end)').index
+                                           '& txEnd >= @load_end)').index
             q_refseq = chrom_refseq.query('name_chrom in @load_genes')
         else:
             q_refseq = chrom_refseq.query('name_chrom == @self.load_gene')
 
         q_refseq = q_refseq.sort_values(by='name_chrom')
         q_refseq['tx_id'] = q_refseq.reset_index().index + 1
+
+        ######################
 
         return q_refseq
 
@@ -192,10 +195,10 @@ class TranscriptPlot():
         # tx_df['xpos'] = [tx.txStart - 0.5, tx.txEnd - 0.5]
         if tx['strand'] == '-':
             tx_df['xpos'] = [tx.txStart - (self.end-self.start)/120,
-                            tx.txEnd + 0.5]
+                             tx.txEnd + 0.5]
         else:
             tx_df['xpos'] = [tx.txStart - 0.5,
-                            tx.txEnd + (self.end-self.start)/120]
+                             tx.txEnd + (self.end-self.start)/120]
 
         tx_df['ypos'] = [tx.tx_id, tx.tx_id]
         tx_df['name'] = [tx['name'], tx['name']]
@@ -219,12 +222,10 @@ class TranscriptPlot():
     def plot_tx_arrow(self, tx):
 
         if tx['strand'] == '-':
-            # x_trian = tx['txEnd'] - 0.5
             x_trian = tx['txStart'] - (self.end-self.start)/120
             angle = pi/2
+            label_offset = 4
         else:
-            # x_trian = tx['txStart'] - 0.5
-
             x_trian = tx['txEnd'] + (self.end-self.start)/120
             angle = -pi/2
 
@@ -233,11 +234,13 @@ class TranscriptPlot():
 
         # Add gene name as label at end of line
         if self.load_gene is None:
-            lbl_dict = {'name_chrom': [tx.name_chrom], 'xpos': [tx.txEnd - 0.5],
+            lbl_dict = {'name_chrom': [tx.name_chrom],
+                        'xpos': [tx.txEnd - 0.5],
                         'ypos': [tx.tx_id]}
             lbl_source = ColumnDataSource(lbl_dict)
             labels = LabelSet(x='xpos', y='ypos', text='name_chrom',
-                              x_offset=6, y_offset=-6, source=lbl_source,
+                              x_offset=4, y_offset=2, 
+                              source=lbl_source,
                               text_font_size='8pt')
             self.plt.add_layout(labels)
 

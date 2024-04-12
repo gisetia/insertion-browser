@@ -48,8 +48,8 @@ def load_insertions__(screen_name, assembly='hg38'):
     return insertions
 
 
-def load_gene_annotations(data_path, assembly='hg38',
-                          known=True, coding=True):
+def load_gene_annotations(data_path, assembly='hg38', known=True,
+                          coding=True):
 
     filters = [("known", "==", known), ("coding", "==", coding)]
     refseq = pd.read_parquet(f'{data_path}/refseq/ncbi-genes-{assembly}.pq',
@@ -58,10 +58,11 @@ def load_gene_annotations(data_path, assembly='hg38',
     return refseq
 
 
-def load_insertions(screen_name, chrom, start, end, assembly='hg38',):
+def load_insertions(data_path, screen_name, chrom, start, end,
+                    assembly='hg38'):
 
     filters = [("pos", ">=", start), ("pos", "<=", end)]
-    insertions = pd.read_parquet(f'{data_path}/screen-insertons/{screen_name}/'
+    insertions = pd.read_parquet(f'{data_path}/screen-insertions/{screen_name}/'
                                  f'{assembly}/insertions.pq/{chrom}',
                                  filters=filters)
 

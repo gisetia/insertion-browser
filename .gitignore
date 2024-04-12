@@ -5,6 +5,7 @@ processed_data/
 process_data.py
 tmp.py
 .DS_Store
+uninstall.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

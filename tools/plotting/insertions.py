@@ -1,4 +1,4 @@
-from token import OP
+# from token import OP
 import pandas as pd
 import numpy as np
 from math import pi
@@ -19,17 +19,15 @@ class InsertionPlot():
 
     def __init__(self, insertions: pd.DataFrame, screen_name: str,
                  assembly: str, chrom: str, start: int,
-                 end: int, load_padd: Optional[int] = 1000000,
+                 end: int, load_padd: Optional[int] = 300000,
                  screen_type: Optional[str] = 'ip',
                  jitter_ins: Optional[bool] = False,
                  plot_height: Optional[int] = None,
                  dashed_edges: Optional[bool] = True,
                  strand: Optional[str] = None) -> None:
 
-        # print(insertions, screen_name, chrom, start, end)
 
         self.load_padd = load_padd
-
         self.insertions = insertions
         self.screen = screen_name
         self.assembly = assembly
@@ -38,11 +36,9 @@ class InsertionPlot():
         self.end = end
         self.strand = strand
         self.screen_type = screen_type
-
-        # print(start, end, self.load_padd)
-
         self.load_start = start - self.load_padd
         self.load_end = end + self.load_padd
+        self.jitter = jitter_ins
 
         # Set plot
         if self.screen_type == 'ip' or self.screen_type == 'pa':
@@ -57,20 +53,21 @@ class InsertionPlot():
             self.ylim = (0, 12)
             height = plot_height or 300
 
+        margins = (self.load_end-self.load_start)/60
         self.plt = figure(
             # title=(f'Insertions of screen {screen_name} - {assembly} at '
             #        f'{chrom}:{start + 1:,} - {end:,} ({end-start+1:,} bp)'),
             plot_width=1000, plot_height=height,
-            x_range=Range1d(start - (end-start)/60,  # - 1000,
-                            end + (end-start)/60,  # + 1000,
+            x_range=Range1d(start - margins,
+                            end + margins,
                             bounds=(start-self.load_padd, end+self.load_padd),
                             min_interval=5
                             ),
             y_range=self.ylim,
             x_axis_location='below',
             min_border_left=150, min_border_right=50,
-            tools='reset, save, xwheel_pan, xwheel_zoom',
-            active_scroll='xwheel_pan')
+            tools='reset, save, xpan, xwheel_zoom',
+            active_scroll='xwheel_zoom', active_drag='xpan')
 
         self.plt.ygrid.grid_line_color = None
         self.plt.xgrid.grid_line_color = None
@@ -80,6 +77,7 @@ class InsertionPlot():
         self.plt.xaxis.visible = False
         self.plt.outline_line_color = None
         self.plt.xaxis.formatter = NumeralTickFormatter(format='0,0')
+        self.plt.toolbar.logo = None
 
         if self.screen_type == 'ip' or self.screen_type == 'pa':
 
@@ -166,18 +164,18 @@ class InsertionPlot():
         self.plot_scale_bar()
 
     def plot_scale_bar(self):
-        bar_size = 10**int(np.log10(self.end - self.start) - 1)
+        bar_size = max(1000, 10**int(np.log10(self.end - self.start) - 1))
 
-        self.plt.rect(x=self.load_start + bar_size/2, width=bar_size, y=self.ylim[1]-.4,
+        self.plt.rect(x=self.start + bar_size/2, width=bar_size, y=self.ylim[1]-.4,
                       height=0.05,
-                      color='#2d3436')
+                      color='#2d3436', name='scale_bar')
 
         lbl_dict = {'size': [f'{int(bar_size/1000)}kb'],
                     'xpos': [self.start], 'ypos': [self.ylim[1]-.35]}
         lbl_source = ColumnDataSource(lbl_dict)
         labels = LabelSet(x='xpos', y='ypos', text='size',
                             x_offset=0, y_offset=0, source=lbl_source,
-                            text_font_size='8pt')
+                            text_font_size='8pt', name='scale_bar_labels')
         self.plt.add_layout(labels)
 
     def update_title(self, attr, old, new):
@@ -273,16 +271,21 @@ class InsertionPlot():
 
         padd = padd or self.load_padd
 
-        self.hide_tools()
+        margins = (self.load_end-self.load_start)/60
+
+        self.plt.tools = []
         self.plt.margin = (40, 0, 0, 0)
         self.plt.plot_height = 150
         self.plt.title = None
         self.plt.xaxis.axis_label = 'Absolute position (0-based)'
 
+        self.plt.select('scale_bar').visible = False
+        self.plt.select('scale_bar_labels').visible = False
+
         self.plt.extra_x_ranges = {'relative_pos':
                                    Range1d(start=-self.load_padd,
-                                           end=self.plt.x_range.end
-                                           - self.plt.x_range.start
+                                           end=self.end
+                                           - self.start
                                            + self.load_padd)}
         self.plt.add_layout(LinearAxis(x_range_name='relative_pos',
                                        axis_label='Relative position'),
@@ -293,17 +296,26 @@ class InsertionPlot():
         self.plt.xaxis.formatter = NumeralTickFormatter(format='0,0')
         self.plt.yaxis.visible = False
 
-        ins_glyph = self.plt.select(name='insertions_dash')
-        ins_glyph.glyph.size = 5
+        if self.jitter:
+            ins_glyph = self.plt.select(name='insertions_dash')
+            ins_glyph.glyph.size = 0.5
 
-        ins_glyph = self.plt.select(name='ins_line')
-        ins_glyph.glyph.line_width = 1
+            ins_glyph = self.plt.select(name='ins_line')
+            ins_glyph.glyph.line_width = 0         
+
+        else:
+            ins_glyph = self.plt.select(name='insertions_dash')
+            ins_glyph.glyph.size = 5
+
+            ins_glyph = self.plt.select(name='ins_line')
+            ins_glyph.glyph.line_width = 1
 
         range_tool = RangeTool(x_range=other_plot.x_range)
         range_tool.overlay.fill_color = "navy"
         range_tool.overlay.fill_alpha = 0.1
         self.plt.add_tools(range_tool)
         self.plt.toolbar.active_multi = range_tool
+        self.plt.toolbar_location = None
 
     def update_div_title(self, attr, old, new):
 
