@@ -19,7 +19,7 @@ class InsertionPlot():
 
     def __init__(self, insertions: pd.DataFrame, screen_name: str,
                  assembly: str, chrom: str, start: int,
-                 end: int, load_padd: Optional[int] = 100000,
+                 end: int, load_padd: Optional[int] = 1000000,
                  screen_type: Optional[str] = 'ip',
                  jitter_ins: Optional[bool] = False,
                  plot_height: Optional[int] = None,
@@ -195,14 +195,16 @@ class InsertionPlot():
         strand = self.strand
 
         if self.strand:
-            q_ins = self.insertions.query('chr == @chrom '
-                                          '& pos >= @load_start '
-                                          '& pos <= @load_end '
-                                          '& strand == @strand')
+            # q_ins = self.insertions.query('chr == @chrom '
+            #                               '& pos >= @load_start '
+            #                               '& pos <= @load_end '
+            #                               '& strand == @strand')
+            q_ins = self.insertions.query('strand == @strand')
         else:
-            q_ins = self.insertions.query('chr == @chrom '
-                                          '& pos >= @load_start '
-                                          '& pos <= @load_end')
+            # q_ins = self.insertions.query('chr == @chrom '
+            #                               '& pos >= @load_start '
+            #                               '& pos <= @load_end')
+            q_ins = self.insertions
 
         if self.screen_type == 'ip' or self.screen_type == 'pa':
 

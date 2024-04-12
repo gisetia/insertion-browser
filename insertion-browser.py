@@ -11,32 +11,31 @@ import tools.plotting.insertions as pltins
 import tools.plotting.transcripts as plttx
 
 
-# col1, col2 = st.columns([3, 2])
+data_path = 'gs://gisetia-insertion-browser/processed_data'
+# data_path = 'processed_data'
 
-# x = [1, 2, 3, 4, 5]
-# y = [6, 7, 2, 4, 5]
-
-# p = figure(
-#     title='simple line example',
-#     x_axis_label='x',
-#     y_axis_label='y', frame_height=200)
-
-# p.line(x, y, legend_label='Trend', line_width=2)
-
-# col1.bokeh_chart(p, use_container_width=True)
-# col2.write('This is a sidebar')
 # %%
-screen_name = 'screenA_sample'
-gene = 'EPC2'
+menu_margins = (20, 10, 0, 10)
+menu_width = 150
+txt_out = Div(text='', margin=menu_margins, width=menu_width)
+
+assembly = 'hg38'
+screen_name = 'screenA'
+gene = 'JAK2'
+
+padd = 1000000
+
+txt_out.text = 'Loading gene annotations...'
 
 print('Loading refseq...')
-refseq = load_gene_annotations('refseq_hg38').query(
-    'known == True and coding == True')
+
+refseq = load_gene_annotations(data_path, assembly=assembly)
 
 gene_pos = refseq.query('name_chrom == @gene')
 chrom = gene_pos.chrom.head(1).values[0]
 start = gene_pos.txStart.min()
 end = gene_pos.txEnd.max()
+
 
 # %%
 
@@ -47,9 +46,26 @@ end = gene_pos.txEnd.max()
 # start = int(position.split(':')[1].split('-')[0].replace(',', '')) - 1
 # end = int(position.split(':')[1].split('-')[1].replace(',', ''))
 
-print('Loading insertions...')
-insertions = load_insertions(screen_name)
+def load_insertions(screen_name, chrom, start, end, assembly='hg38',):
 
+    filters = [("pos", ">=", start), ("pos", "<=", end)]
+    insertions = pd.read_parquet(f'{data_path}/screen-insertions/'
+                                 f'{screen_name}/{assembly}/insertions.pq/'
+                                 f'{chrom}',
+                                 filters=filters)
+
+    return insertions
+
+
+
+
+txt_out.text = 'Loading screen insertions...'
+print('Loading insertions...')
+insertions = load_insertions(screen_name, chrom, start-padd, end+padd,
+                             assembly=assembly)
+
+txt_out.text = ''
+insertions
 
 # %%
 reload(pltins)
@@ -85,8 +101,7 @@ def plot_ins(insertions, screen_name, chrom, start, end, refseq,
 plots = plot_ins(insertions, screen_name, chrom, start, end, refseq)
 
 # Menus
-menu_margins = (20, 10, 0, 10)
-menu_width = 150
+
 pos_input = TextInput(title='1-based position', value='',
                       placeholder='eg. chr9:5,450,503-5,470,567',
                       width=menu_width, margin=menu_margins)
@@ -111,8 +126,6 @@ gene_menu = AutocompleteInput(title='Gene (refseq symbol)', value=gene,
                               completions=gene_opts, width=menu_width,
                               min_characters=1, case_sensitive=False,
                               margin=menu_margins)
-
-txt_out = Div(text='', margin=menu_margins, width=menu_width)
 
 
 def load_gene(attr, old, new):

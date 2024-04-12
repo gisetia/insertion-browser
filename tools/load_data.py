@@ -14,7 +14,7 @@ def request_gdrive_data(file_id, session=session):
     return requests.get(url)
 
 
-def load_gene_annotations(annot_name):
+def load_gene_annotations__(annot_name):
 
     with open('file_ids/gene_annotations.json', 'r') as f:
         gene_annotations = json.load(f)
@@ -27,7 +27,7 @@ def load_gene_annotations(annot_name):
     return refseq
 
 
-def load_insertions(screen_name, assembly='hg38'):
+def load_insertions__(screen_name, assembly='hg38'):
 
     with open('file_ids/ins_file_ids.json', 'r') as f:
         ins_file_ids = json.load(f)
@@ -45,5 +45,24 @@ def load_insertions(screen_name, assembly='hg38'):
 
         insertions = pd.concat(insertions_list)
 
+    return insertions
+
+
+def load_gene_annotations(data_path, assembly='hg38',
+                          known=True, coding=True):
+
+    filters = [("known", "==", known), ("coding", "==", coding)]
+    refseq = pd.read_parquet(f'{data_path}/refseq/ncbi-genes-{assembly}.pq',
+                             filters=filters)
+
+    return refseq
+
+
+def load_insertions(screen_name, chrom, start, end, assembly='hg38',):
+
+    filters = [("pos", ">=", start), ("pos", "<=", end)]
+    insertions = pd.read_parquet(f'{data_path}/screen-insertons/{screen_name}/'
+                                 f'{assembly}/insertions.pq/{chrom}',
+                                 filters=filters)
 
     return insertions

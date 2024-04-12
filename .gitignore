@@ -3,6 +3,8 @@ venv/
 raw_data/
 processed_data/
 process_data.py
+tmp.py
+.DS_Store
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

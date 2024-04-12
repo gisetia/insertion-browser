@@ -184,9 +184,11 @@ def get_exon_regions(gene_pos: pd.DataFrame) -> pd.DataFrame:
     exon = exon.explode('exonRange')
     exon = exon.reset_index(drop=True)
     exon['exon_id'] = exon.index + 1
-    exon = exon.drop(columns=['#bin', 'exonStarts', 'exonEnds', 'score',
-                              'cdsStartStat', 'cdsEndStat', 'exonFrames',
-                              'cdsStart', 'cdsEnd'])
+    exon = exon.drop(columns=[
+        # '#bin', 'score', 'exonFrames',
+        'exonStarts', 'exonEnds',
+        'cdsStartStat', 'cdsEndStat',
+        'cdsStart', 'cdsEnd'])
 
     exon['exCds_lst'] = exon.apply(lambda t: [x for x in t.exonRange
                                               if x in t.cdsRange], axis=1)
