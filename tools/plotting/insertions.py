@@ -57,7 +57,7 @@ class InsertionPlot():
         self.plt = figure(
             # title=(f'Insertions of screen {screen_name} - {assembly} at '
             #        f'{chrom}:{start + 1:,} - {end:,} ({end-start+1:,} bp)'),
-            plot_width=900, plot_height=height,
+            plot_width=1000, plot_height=height,
             x_range=Range1d(start - margins,
                             end + margins,
                             bounds=(start-self.load_padd, end+self.load_padd),
@@ -65,7 +65,7 @@ class InsertionPlot():
                             ),
             y_range=self.ylim,
             x_axis_location='below',
-            min_border_left=150, min_border_right=50,
+            min_border_left=70, min_border_right=10,
             tools='reset, save, xpan, xwheel_zoom',
             active_scroll='xwheel_zoom', active_drag='xpan')
 
@@ -87,10 +87,10 @@ class InsertionPlot():
                                                         2: 'High'}
             else:
                 self.plt.yaxis.ticker = [1, 2, 3.5, 4.5]
-                self.plt.yaxis.major_label_overrides = {1: 'Low - strand',
-                                                        2: 'Low + strand',
-                                                        3.5: 'High - strand',
-                                                        4.5: 'High + strand'}
+                self.plt.yaxis.major_label_overrides = {1: 'Low -',
+                                                        2: 'Low +',
+                                                        3.5: 'High -',
+                                                        4.5: 'High +'}
         elif self.screen_type == 'sl':
             self.plt.yaxis.ticker = [1, 2, 4, 5, 7, 8, 10, 11]
             self.plt.yaxis.major_label_overrides = {1: 'replicate 4 -',

@@ -47,7 +47,7 @@ class TranscriptPlot():
 
         # Set plot
         self.ylim = (0.5, len(self.transcripts) + 0.8)
-        self.plt = figure(plot_width=900, frame_height=plot_height,
+        self.plt = figure(plot_width=1000, frame_height=plot_height,
                           x_range=Range1d(start-(end-start)/60,  # - 1000,
                                           end+(end-start)/60,  # + 1000,
                                           bounds=(self.load_start,
@@ -56,7 +56,7 @@ class TranscriptPlot():
                                           ),
                           y_range=self.ylim,
                           title=plot_title,
-                          min_border_left=150, min_border_right=50,
+                          min_border_left=70, min_border_right=50,
                           #   min_border_top=100,
                           x_axis_location='below',
                           tools='reset, save, xpan, xwheel_zoom',
