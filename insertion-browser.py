@@ -19,7 +19,7 @@ if os.uname().sysname == 'Darwin':
     data_path = 'processed_data'
 
 # %%
-menu_margins = (20, 2, 0, 10)
+menu_margins = (20, 0, 0, 0)
 menu_width = 170
 txt_out = Div(text='', margin=menu_margins, width=menu_width)
 
