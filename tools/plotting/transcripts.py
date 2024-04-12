@@ -56,7 +56,7 @@ class TranscriptPlot():
                                           ),
                           y_range=self.ylim,
                           title=plot_title,
-                          min_border_left=70, min_border_right=50,
+                          min_border_left=70, min_border_right=10,
                           #   min_border_top=100,
                           x_axis_location='below',
                           tools='reset, save, xpan, xwheel_zoom',

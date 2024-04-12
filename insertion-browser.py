@@ -11,16 +11,13 @@ from tools.load_data import *
 import tools.plotting.insertions as pltins
 import tools.plotting.transcripts as plttx
 
-
-# %%
-
 data_path = 'gs://gisetia-insertion-browser/processed_data'
 if os.uname().sysname == 'Darwin':
     data_path = 'processed_data'
 
 # %%
 menu_margins = (20, 0, 0, 0)
-menu_width = 170
+menu_width = 150
 txt_out = Div(text='', margin=menu_margins, width=menu_width)
 
 assembly = 'hg38'
@@ -40,18 +37,11 @@ chrom = gene_pos.chrom.head(1).values[0]
 start = gene_pos.txStart.min()
 end = gene_pos.txEnd.max()
 
-
-# %%
-
 txt_out.text = 'Loading screen insertions...'
 print('Loading insertions...')
 insertions = load_insertions(data_path, screen_name, chrom, start-padd,
-                             end+padd,
-                             #  assembly=assembly
-                             )
-
+                             end+padd, assembly=assembly)
 txt_out.text = ''
-
 
 # %%
 reload(pltins)
